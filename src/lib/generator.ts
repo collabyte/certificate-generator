@@ -1,6 +1,8 @@
 import { PDFDocument, rgb, StandardFonts, PDFPage, PDFFont } from "pdf-lib";
 import fs from "fs";
 import { exit } from "process";
+import csv from "csv-parser";
+
 
 const TEMPLATE_CERTIFICATE: string = "template.pdf";
 const OUTPUT_DIR: string = "./certificates";
@@ -21,7 +23,7 @@ function calculatePosition(name: string, font: PDFFont, size: number, page: PDFP
   const textWidth = font.widthOfTextAtSize(name, size);
 
   const x = (width - textWidth) / 2; //justify center
-  const y = height - 230; //hardcoded
+  const y = height - 247; //hardcoded
 
   return { x, y };
 }
