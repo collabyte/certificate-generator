@@ -4,6 +4,7 @@ certificates/
 eslint.config.js
 names.csv
 package-lock.json
+*.tsv
 
 # Logs
 logs
