@@ -2,7 +2,7 @@ template.pdf
 node_modules/
 certificates/
 eslint.config.js
-*.csv
+names.csv
 package-lock.json
 *.tsv
 
