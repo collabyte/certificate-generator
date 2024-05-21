@@ -1,15 +1,20 @@
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, rgb, StandardFonts, PDFPage, PDFFont } from "pdf-lib";
 import fs from "fs";
 import { exit } from "process";
 
-const TEMPLATE_CERTIFICATE = "template.pdf";
-const OUTPUT_DIR = "./certificates";
-const FONT_SIZE = 50;
+const TEMPLATE_CERTIFICATE: string = "template.pdf";
+const OUTPUT_DIR: string = "./certificates";
+const FONT_SIZE: number = 50;
 const COLOR = rgb(0, 108 / 256, 137 / 256);
-const NAMES_FILE = "names.csv";
-const LINE_ENDING = "\r\n";
+const NAMES_FILE: string = "names.csv";
+const LINE_ENDING: string = "\r\n";
 
-function calculatePosition(name, font, size, page) {
+interface Position {
+  x: number;
+  y: number;
+}
+
+function calculatePosition(name: string, font: PDFFont, size: number, page: PDFPage): Position {
   const { width, height } = page.getSize();
 
   //calculate the total width of text
@@ -22,14 +27,14 @@ function calculatePosition(name, font, size, page) {
 }
 
 // Function to load the PDF document
-async function loadPdfDocument() {
+async function loadPdfDocument(): Promise<PDFDocument> {
   const existingPdfBytes = fs.readFileSync(TEMPLATE_CERTIFICATE);
   const pdfDoc = await PDFDocument.load(existingPdfBytes);
   return pdfDoc;
 }
 
 // Function to draw the text on the page
-async function drawTextOnPage(pdfDoc, name) {
+async function drawTextOnPage(pdfDoc: PDFDocument, name: string): Promise<Uint8Array> {
   const page = pdfDoc.getPages()[0]; //accessing first page
   const font = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
   const { x, y } = calculatePosition(name, font, FONT_SIZE, page);
@@ -38,7 +43,7 @@ async function drawTextOnPage(pdfDoc, name) {
 }
 
 // Function to write the modified PDF bytes to a file
-function writeToFile(name, modifiedPdfBytes) {
+function writeToFile(name: string, modifiedPdfBytes: Uint8Array): void {
   if (!fs.existsSync(OUTPUT_DIR)) {
     fs.mkdirSync(OUTPUT_DIR);
   }
@@ -48,7 +53,7 @@ function writeToFile(name, modifiedPdfBytes) {
 }
 
 // Function to generate a certificate for a given name
-async function generateCertificate(name) {
+async function generateCertificate(name: string): Promise<void> {
   const pdfDoc = await loadPdfDocument();
   const modifiedPdf = await drawTextOnPage(pdfDoc, name);
   writeToFile(name, modifiedPdf);
@@ -61,7 +66,7 @@ if (!fs.existsSync(TEMPLATE_CERTIFICATE)) {
   );
   exit(0);
 } else {
-  const names = fs.readFileSync(NAMES_FILE, "utf-8").split(LINE_ENDING); //returns list of names
+  const names: string[] = fs.readFileSync(NAMES_FILE, "utf-8").split(LINE_ENDING); //returns list of names
   for (const name of names) {
     console.log(`Generating certificate for ${name}`);
     generateCertificate(name);
