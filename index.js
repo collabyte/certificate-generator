@@ -3,7 +3,6 @@ import fs from "fs";
 import { exit } from "process";
 import csv from "csv-parser";
 
-
 const TEMPLATE_CERTIFICATE = "template.pdf";
 const OUTPUT_DIR = "./certificates";
 const FONT_SIZE = 50;
@@ -13,21 +12,20 @@ const NAMES_FILE = "git_and_github.tsv";
 async function getUniqueFullNamesFromCSV(file) {
   return new Promise((resolve, reject) => {
     const names = new Set();
-    fs.createReadStream(file, { encoding: 'utf-16le' })
-      .pipe(csv({ separator: '\t' }))
-      .on('data', (row) => {
+    fs.createReadStream(file, { encoding: "utf-16le" })
+      .pipe(csv({ separator: "\t" }))
+      .on("data", (row) => {
         const [firstPair] = Object.entries(row);
         const personName = firstPair[1].replace(/(\r\n|\n|\r)/gm, "");
-        const cleanedName = personName.replace(/ ?\(.*?\)/g, '');
+        const cleanedName = personName.replace(/ ?\(.*?\)/g, "");
         names.add(cleanedName);
       })
-      .on('end', () => {
+      .on("end", () => {
         resolve(Array.from(names));
       })
-      .on('error', reject);
+      .on("error", reject);
   });
 }
-
 
 function calculatePosition(name, font, size, page) {
   const { width, height } = page.getSize();
@@ -82,12 +80,12 @@ if (!fs.existsSync(TEMPLATE_CERTIFICATE)) {
   exit(0);
 } else {
   getUniqueFullNamesFromCSV(NAMES_FILE)
-    .then(names => {
+    .then((names) => {
       console.log(`Generating certificates for ${names.length} names`);
       for (const name of names) {
         console.log(`Generating certificate for ${name}`);
         generateCertificate(name);
       }
     })
-    .catch(err => console.error(err));
+    .catch((err) => console.error(err));
 }
