@@ -2,5 +2,6 @@ template.pdf
 node_modules/
 certificates/
 eslint.config.js
-names.csv
+*.csv
 package-lock.json
+*.tsv

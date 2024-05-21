@@ -5,11 +5,12 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-   "code": "node index.js"
+    "code": "node index.js"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "csv-parser": "^3.0.0",
     "pdf-lib": "^1.17.1"
   },
   "devDependencies": {

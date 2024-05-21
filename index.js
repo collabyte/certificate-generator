@@ -1,13 +1,33 @@
 import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
 import fs from "fs";
 import { exit } from "process";
+import csv from "csv-parser";
+
 
 const TEMPLATE_CERTIFICATE = "template.pdf";
 const OUTPUT_DIR = "./certificates";
 const FONT_SIZE = 50;
-const COLOR = rgb(0, 108 / 256, 137 / 256);
-const NAMES_FILE = "names.csv";
-const LINE_ENDING = "\r\n";
+const COLOR = rgb(61 / 256, 90 / 256, 128 / 256);
+const NAMES_FILE = "git_and_github.tsv";
+
+async function getUniqueFullNamesFromCSV(file) {
+  return new Promise((resolve, reject) => {
+    const names = new Set();
+    fs.createReadStream(file, { encoding: 'utf-16le' })
+      .pipe(csv({ separator: '\t' }))
+      .on('data', (row) => {
+        const [firstPair] = Object.entries(row);
+        const personName = firstPair[1].replace(/(\r\n|\n|\r)/gm, "");
+        const cleanedName = personName.replace(/ ?\(.*?\)/g, '');
+        names.add(cleanedName);
+      })
+      .on('end', () => {
+        resolve(Array.from(names));
+      })
+      .on('error', reject);
+  });
+}
+
 
 function calculatePosition(name, font, size, page) {
   const { width, height } = page.getSize();
@@ -16,7 +36,7 @@ function calculatePosition(name, font, size, page) {
   const textWidth = font.widthOfTextAtSize(name, size);
 
   const x = (width - textWidth) / 2; //justify center
-  const y = height - 230; //hardcoded
+  const y = height - 247; //hardcoded
 
   return { x, y };
 }
@@ -61,9 +81,13 @@ if (!fs.existsSync(TEMPLATE_CERTIFICATE)) {
   );
   exit(0);
 } else {
-  const names = fs.readFileSync(NAMES_FILE, "utf-8").split(LINE_ENDING); //returns list of names
-  for (const name of names) {
-    console.log(`Generating certificate for ${name}`);
-    generateCertificate(name);
-  }
+  getUniqueFullNamesFromCSV(NAMES_FILE)
+    .then(names => {
+      console.log(`Generating certificates for ${names.length} names`);
+      for (const name of names) {
+        console.log(`Generating certificate for ${name}`);
+        generateCertificate(name);
+      }
+    })
+    .catch(err => console.error(err));
 }
