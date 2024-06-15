@@ -4,26 +4,52 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import NameList from "@/components/webview/NamesList";
-import { PDFDocument, rgb, StandardFonts } from "pdf-lib";
+import { PDFDocument, PDFFont, PDFPage, rgb, StandardFonts } from "pdf-lib";
 import { saveAs } from "file-saver";
 
-async function generatePDF(names: string[], file: File) {
+function calculatePosition(
+  name: string,
+  font: PDFFont,
+  size: number,
+  page: PDFPage,
+  namePos: number
+) {
+  const { width, height } = page.getSize();
+
+  //calculate the total width of text
+  const textWidth = font.widthOfTextAtSize(name, size);
+
+  const x = (width - textWidth) / 2; //justify center
+  const y = height - namePos; //hardcoded
+
+  return { x, y };
+}
+
+async function generatePDF(
+  names: string[],
+  file: File,
+  fontSize = 16,
+  namePos = 16
+) {
   const pdfBytes = await file.arrayBuffer();
 
   for (const name of names) {
     const pdfDoc = await PDFDocument.load(pdfBytes);
     const pages = pdfDoc.getPages();
     const firstPage = pages[0];
-    const { x, y } = { x: 50, y: 50 };
+    const font = await pdfDoc.embedFont(StandardFonts.TimesRomanBold);
 
-    const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
-    const fontSize = 30;
-    const textWidth = font.widthOfTextAtSize(name, fontSize);
-    const textHeight = font.heightAtSize(fontSize);
+    const { x, y } = calculatePosition(
+      name,
+      font,
+      fontSize,
+      firstPage,
+      namePos
+    );
 
     firstPage.drawText(name, {
-      x: x - textWidth / 2,
-      y: y - textHeight / 2,
+      x,
+      y,
       size: fontSize,
       font: font,
       color: rgb(0, 0, 0),
@@ -50,8 +76,13 @@ export function Homepage() {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>): void => {
     e.preventDefault();
     setIsLoading(true);
+    const formdata = new FormData(e.currentTarget);
+
+    const fontSize = Number(formdata.get("font-size"));
+    const namePos = Number(formdata.get("name-pos"));
+
     if (file) {
-      generatePDF(names, file).then(() => {
+      generatePDF(names, file, fontSize, namePos).then(() => {
         setIsLoading(false);
       });
     }
@@ -80,7 +111,7 @@ export function Homepage() {
                 type="number"
                 placeholder="Enter name position"
                 className="w-full"
-                defaultValue="16"
+                defaultValue="247"
               />
             </div>
           </div>
