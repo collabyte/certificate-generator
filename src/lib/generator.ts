@@ -1,6 +1,4 @@
 import { PDFDocument, rgb, StandardFonts, PDFPage, PDFFont } from "pdf-lib";
-import fs from "fs";
-import { exit } from "process";
 
 const TEMPLATE_CERTIFICATE: string = "template.pdf";
 const OUTPUT_DIR: string = "./certificates";
