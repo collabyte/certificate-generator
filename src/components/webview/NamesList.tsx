@@ -6,11 +6,9 @@ const NamesList = ({ names }: { names: string[] }) => {
     <>
       <ScrollArea className="w-full p-1 h-24 m-border ">
         <div className="w-full space-y-2">
-          {names.map(
-            (name: string, index: number) => (
-              console.log(name), (<NameTag key={index} name={name} />)
-            )
-          )}
+          {names.map((name: string, index: number) => (
+            <NameTag key={index} name={name} />
+          ))}
         </div>
         <ScrollBar orientation="vertical" />
       </ScrollArea>
