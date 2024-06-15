@@ -9,16 +9,11 @@ A simple node script to generate certificate
 - [Contributing](#contributing)
 - [License](#license)
 
-## Installation
+## Installation and Usage
 
 1. Clone the repository.
 2. Install the dependencies using `npm install`.
-
-## Usage
-
-1. Make sure you have [node](https://nodejs.org/en/download/current) installed.
-2. Keep the template certificate in root dir named `template.pdf`.
-3. Run the application using `npm run code`.
+3. Run the application using `npm run dev`.
 
 Note: The positions of text are hardcoded so you might need to experiment before generating in batch.
 
@@ -35,3 +30,11 @@ Contributions are welcome! Please follow these steps:
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+---
+
+# TODOs
+
+- Add edge case handling with toast notification
+- Add color picker for font color
+- Add PDF preview before batch generation
