@@ -38,3 +38,4 @@ This project is licensed under the [MIT License](LICENSE).
 - Add edge case handling with toast notification
 - Add color picker for font color
 - Add PDF preview before batch generation
+- Cleaner code
